@@ -1022,7 +1022,7 @@ QVariantMap Graph::sampleValues(qsizetype channel_ix, const shv::visu::timeline:
 	ret[KEY_SAMPLE_TIME] = dt;
 	ret[KEY_SAMPLE_VALUE] = s.value;
 	if(shv::coreqt::Utils::isValueNotAvailable(s.value)) {
-		ret[KEY_SAMPLE_PRETTY_VALUE] = tr("N/A");
+		ret[KEY_SAMPLE_PRETTY_VALUE] = tr("Not available");
 		return ret;
 	}
 	auto rv = shv::coreqt::Utils::qVariantToRpcValue(s.value);
