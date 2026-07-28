@@ -33,7 +33,7 @@ static const QString VIEWS_KEY = QStringLiteral("channelViews");
 const QString Graph::DEFAULT_USER_PROFILE = QStringLiteral("default");
 
 namespace {
-static const int VALUE_NOT_AVILABLE_Y = std::numeric_limits<int>::max();
+constexpr int VALUE_NOT_AVILABLE_Y = std::numeric_limits<int>::max();
 
 bool isValueNotAvailable(int y)
 {
