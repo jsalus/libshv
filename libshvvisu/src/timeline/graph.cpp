@@ -33,11 +33,11 @@ static const QString VIEWS_KEY = QStringLiteral("channelViews");
 const QString Graph::DEFAULT_USER_PROFILE = QStringLiteral("default");
 
 namespace {
-constexpr int VALUE_NOT_AVILABLE_Y = std::numeric_limits<int>::max();
+constexpr int VALUE_NOT_AVAILABLE_Y = std::numeric_limits<int>::max();
 
 bool isValueNotAvailable(int y)
 {
-	return y == VALUE_NOT_AVILABLE_Y;
+	return y == VALUE_NOT_AVAILABLE_Y;
 }
 }
 
@@ -2002,7 +2002,7 @@ std::function<QPoint (const Sample &s, Graph::TypeId meta_type_id)> Graph::dataT
 		int int_x = (x > MAX_INT2)? MAX_INT2 : (x < MIN_INT2)? MIN_INT2 : static_cast<int>(x);
 		int int_y;
 		if(shv::coreqt::Utils::isValueNotAvailable(s.value)) {
-			int_y = VALUE_NOT_AVILABLE_Y;
+			int_y = VALUE_NOT_AVAILABLE_Y;
 		}
 		else {
 			bool ok;
