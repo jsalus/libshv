@@ -32,7 +32,14 @@ static const QString VIEWS_KEY = QStringLiteral("channelViews");
 
 const QString Graph::DEFAULT_USER_PROFILE = QStringLiteral("default");
 
-static const int VALUE_NOT_AVILABLE_Y = std::numeric_limits<int>::max();
+namespace {
+constexpr int VALUE_NOT_AVAILABLE_Y = std::numeric_limits<int>::max();
+
+bool isValueNotAvailable(int y)
+{
+	return y == VALUE_NOT_AVAILABLE_Y;
+}
+}
 
 //==========================================
 // Graph::GraphStyle
@@ -412,6 +419,14 @@ Sample Graph::timeToSample(qsizetype channel_ix, timemsec_t time) const
 			return Sample();
 		Sample s1 = m->sampleAt(model_ix, ix1.value());
 		Sample s2 = m->sampleAt(model_ix, ix2);
+		if(shv::coreqt::Utils::isValueNotAvailable(s1.value)) {
+			s1.time = time;
+			return s1;
+		}
+		if(shv::coreqt::Utils::isValueNotAvailable(s2.value)) {
+			s1.time = time;
+			return s1;
+		}
 		if(s1.time == s2.time)
 			return Sample();
 		double d = s1.value.toDouble() + static_cast<double>(time - s1.time) * (s2.value.toDouble() - s1.value.toDouble()) / static_cast<double>(s2.time - s1.time);
@@ -1013,6 +1028,10 @@ QVariantMap Graph::sampleValues(qsizetype channel_ix, const shv::visu::timeline:
 #endif
 	ret[KEY_SAMPLE_TIME] = dt;
 	ret[KEY_SAMPLE_VALUE] = s.value;
+	if(shv::coreqt::Utils::isValueNotAvailable(s.value)) {
+		ret[KEY_SAMPLE_PRETTY_VALUE] = tr("Not available");
+		return ret;
+	}
 	auto rv = shv::coreqt::Utils::qVariantToRpcValue(s.value);
 	if (channel_info.typeDescr.type() == shv::core::utils::ShvTypeDescr::Type::Decimal) {
 		ret[KEY_SAMPLE_PRETTY_VALUE] = QLocale::system().toString(s.value.toDouble(), 'f', channel_info.typeDescr.decimalPlaces());
@@ -1983,7 +2002,7 @@ std::function<QPoint (const Sample &s, Graph::TypeId meta_type_id)> Graph::dataT
 		int int_x = (x > MAX_INT2)? MAX_INT2 : (x < MIN_INT2)? MIN_INT2 : static_cast<int>(x);
 		int int_y;
 		if(shv::coreqt::Utils::isValueNotAvailable(s.value)) {
-			int_y = VALUE_NOT_AVILABLE_Y;
+			int_y = VALUE_NOT_AVAILABLE_Y;
 		}
 		else {
 			bool ok;
@@ -2358,7 +2377,7 @@ void Graph::drawSamples(QPainter *painter, int channel_ix, const DataRect &src_r
 			SamePixelValue(int x_, int y_) : x(x_), y1(y_), y2(y_), minY(y_), maxY(y_) {}
 			SamePixelValue(const QPoint &p) : x(p.x()), y1(p.y()), y2(p.y()), minY(p.y()), maxY(p.y()) {}
 			bool isValid() const { return x != NO_X; }
-			bool isValueNotAvailable() const { return y1 == VALUE_NOT_AVILABLE_Y; }
+			bool isValueNotAvailable() const { return shv::visu::timeline::isValueNotAvailable(y1); }
 		};
 		SamePixelValue prev_point;
 
@@ -2413,7 +2432,16 @@ void Graph::drawSamples(QPainter *painter, int channel_ix, const DataRect &src_r
 						if(prev_point.isValid() && prev_point.maxY != prev_point.minY) {
 							painter->drawLine(prev_point.x, prev_point.minY, prev_point.x, prev_point.maxY);
 						}
-						if(interpolation == GraphChannel::Style::Interpolation::None) {
+						if(isValueNotAvailable(current_point.y()) && interpolation != GraphChannel::Style::Interpolation::None) {
+							if(line_area_color.isValid()) {
+								QPoint top_left{prev_point.x, prev_point.y2};
+								QPoint bottom_right{current_point.x(), x_axis_y};
+								painter->fillRect(QRect{top_left, bottom_right}, line_area_color);
+							}
+							painter->setPen(line_pen);
+							painter->drawLine(QPoint{prev_point.x, prev_point.y2}, QPoint{current_point.x(), prev_point.y2});
+						}
+						else if(interpolation == GraphChannel::Style::Interpolation::None) {
 							if(line_area_color.isValid()) {
 								// draw line from x axis to point
 								QPoint p0{prev_point.x, x_axis_y};

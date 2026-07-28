@@ -430,6 +430,10 @@
 (data error)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Not available</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>shv::visu::timeline::GraphWidget</name>
