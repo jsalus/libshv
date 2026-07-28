@@ -32,7 +32,14 @@ static const QString VIEWS_KEY = QStringLiteral("channelViews");
 
 const QString Graph::DEFAULT_USER_PROFILE = QStringLiteral("default");
 
+namespace {
 static const int VALUE_NOT_AVILABLE_Y = std::numeric_limits<int>::max();
+
+bool isValueNotAvailable(int y)
+{
+	return y == VALUE_NOT_AVILABLE_Y;
+}
+}
 
 //==========================================
 // Graph::GraphStyle
@@ -2370,7 +2377,7 @@ void Graph::drawSamples(QPainter *painter, int channel_ix, const DataRect &src_r
 			SamePixelValue(int x_, int y_) : x(x_), y1(y_), y2(y_), minY(y_), maxY(y_) {}
 			SamePixelValue(const QPoint &p) : x(p.x()), y1(p.y()), y2(p.y()), minY(p.y()), maxY(p.y()) {}
 			bool isValid() const { return x != NO_X; }
-			bool isValueNotAvailable() const { return y1 == VALUE_NOT_AVILABLE_Y; }
+			bool isValueNotAvailable() const { return shv::visu::timeline::isValueNotAvailable(y1); }
 		};
 		SamePixelValue prev_point;
 
@@ -2425,7 +2432,7 @@ void Graph::drawSamples(QPainter *painter, int channel_ix, const DataRect &src_r
 						if(prev_point.isValid() && prev_point.maxY != prev_point.minY) {
 							painter->drawLine(prev_point.x, prev_point.minY, prev_point.x, prev_point.maxY);
 						}
-						if(current_point.y() == VALUE_NOT_AVILABLE_Y && interpolation != GraphChannel::Style::Interpolation::None) {
+						if(isValueNotAvailable(current_point.y()) && interpolation != GraphChannel::Style::Interpolation::None) {
 							if(line_area_color.isValid()) {
 								QPoint top_left{prev_point.x, prev_point.y2};
 								QPoint bottom_right{current_point.x(), x_axis_y};
