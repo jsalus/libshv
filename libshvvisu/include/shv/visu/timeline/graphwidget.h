@@ -91,11 +91,14 @@ protected:
 		GraphDataAreaLeftPress,
 		GraphDataAreaLeftCtrlPress,
 		GraphDataAreaLeftCtrlShiftPress,
+		GraphDataAreaLeftAltPress,
+		GraphDataAreaTouchPress,
 		GraphDataAreaMiddlePress,
 		GraphDataAreaRightPress,
 
 		GraphAreaMove,
 		GraphAreaSelection,
+		GraphAreaRectSelection,
 	};
 	MouseOperation m_mouseOperation = MouseOperation::None;
 	QPoint m_mouseOperationStartPos;
