@@ -349,7 +349,7 @@ void GraphWidget::mousePressEvent(QMouseEvent *event)
 #if QT_VERSION_MAJOR >= 6
 				if (event->pointingDevice()->type() == QInputDevice::DeviceType::TouchScreen) {
 					if (m_pinchOperationStart.first == 0 && m_pinchOperationStart.second == 0) {
-						m_mouseOperation = MouseOperation::GraphDataAreaTouchPress;
+						m_mouseOperation = MouseOperation::GraphDataAreaLeftCtrlPress;
 					}
 				}
 				else
@@ -431,8 +431,7 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *event)
 				return;
 			}
 		}
-		else if(old_mouse_op == MouseOperation::GraphAreaSelection
-				|| old_mouse_op == MouseOperation::GraphAreaRectSelection) {
+		else if(old_mouse_op == MouseOperation::GraphAreaAxisZoom || old_mouse_op == MouseOperation::GraphAreaRectSelection) {
 			m_graph->zoomToSelection(m_zoomType);
 			event->accept();
 			graph()->setSelectionRect(QRect());
@@ -457,7 +456,7 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *event)
 		}
 	}
 	else if(event->button() == Qt::RightButton) {
-		if(old_mouse_op == MouseOperation::GraphDataAreaRightPress || old_mouse_op == MouseOperation::GraphAreaSelection) {
+		if(old_mouse_op == MouseOperation::GraphDataAreaRightPress || old_mouse_op == MouseOperation::GraphAreaRectSelection) {
 			if(event->modifiers() == Qt::NoModifier) {
 				auto ch_ix = posToChannel(event->pos());
 				if(ch_ix) {
@@ -542,7 +541,7 @@ void GraphWidget::mouseMoveEvent(QMouseEvent *event)
 	case MouseOperation::GraphDataAreaLeftPress: {
 		QPoint point = pos - m_mouseOperationStartPos;
 		if (point.manhattanLength() > 3) {
-			m_mouseOperation = MouseOperation::GraphAreaSelection;
+			m_mouseOperation = MouseOperation::GraphAreaAxisZoom;
 		}
 		break;
 	}
@@ -553,16 +552,14 @@ void GraphWidget::mouseMoveEvent(QMouseEvent *event)
 		}
 		break;
 	}
-	case MouseOperation::GraphDataAreaLeftCtrlPress:
-		break;
 	case MouseOperation::GraphDataAreaRightPress: {
 		QPoint point = pos - m_mouseOperationStartPos;
 		if (point.manhattanLength() > 3) {
-			m_mouseOperation = MouseOperation::GraphAreaSelection;
+			m_mouseOperation = MouseOperation::GraphAreaRectSelection;
 		}
 		break;
 	}
-	case MouseOperation::GraphAreaSelection:
+	case MouseOperation::GraphAreaAxisZoom:
 	case MouseOperation::GraphAreaRectSelection: {
 		auto ch1_ix = m_graph->posToChannel(m_mouseOperationStartPos);
 		if (!ch1_ix) {
@@ -604,7 +601,7 @@ void GraphWidget::mouseMoveEvent(QMouseEvent *event)
 	}
 	case MouseOperation::GraphAreaMove:
 	case MouseOperation::GraphDataAreaMiddlePress:
-	case MouseOperation::GraphDataAreaTouchPress: {
+	case MouseOperation::GraphDataAreaLeftCtrlPress: {
 		m_mouseOperation = MouseOperation::GraphAreaMove;
 		timemsec_t t0 = gr->posToTime(m_mouseOperationStartPos.x());
 		timemsec_t t1 = gr->posToTime(pos.x());

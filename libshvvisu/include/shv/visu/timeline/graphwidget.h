@@ -92,12 +92,11 @@ protected:
 		GraphDataAreaLeftCtrlPress,
 		GraphDataAreaLeftCtrlShiftPress,
 		GraphDataAreaLeftAltPress,
-		GraphDataAreaTouchPress,
 		GraphDataAreaMiddlePress,
 		GraphDataAreaRightPress,
 
 		GraphAreaMove,
-		GraphAreaSelection,
+		GraphAreaAxisZoom,
 		GraphAreaRectSelection,
 	};
 	MouseOperation m_mouseOperation = MouseOperation::None;
