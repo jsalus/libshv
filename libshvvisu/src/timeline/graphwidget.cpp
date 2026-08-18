@@ -857,10 +857,11 @@ void GraphWidget::contextMenuEvent(QContextMenuEvent *event)
 		// showGraphContextMenu(pos);
 		return;
 	}
-	for (int i = 0; i < m_graph->channelCount(); ++i) {
+	for (int i : m_graph->visibleChannels()) {
 		const GraphChannel *ch = m_graph->channelAt(i);
-		if(ch->verticalHeaderRect().contains(pos)) {
+		if (ch->verticalHeaderRect().contains(pos)) {
 			showChannelContextMenu(i, pos);
+			return;
 		}
 	}
 }
@@ -1124,4 +1125,3 @@ GraphWidget::ChannelHeaderMoveContext::~ChannelHeaderMoveContext()
 }
 
 }
-
