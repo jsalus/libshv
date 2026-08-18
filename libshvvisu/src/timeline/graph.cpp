@@ -1188,7 +1188,7 @@ void Graph::makeLayout(const QRect &pref_rect)
 	m_layout.cornerCellRect.setLeft(u2px(m_style.leftMargin()));
 	m_layout.cornerCellRect.setWidth(m_layout.xAxisRect.left() - m_layout.cornerCellRect.left());
 
-	// Clear stale geometry so hidden channels cannot interact with the mouse.
+	// clear stale geometry so hidden channels cannot interact with the mouse
 	for (int i = 0; i < m_channels.count(); ++i) {
 		GraphChannel *ch = channelAt(i);
 		ch->m_layout.graphAreaRect = {};
