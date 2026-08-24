@@ -1188,11 +1188,13 @@ void Graph::makeLayout(const QRect &pref_rect)
 	m_layout.cornerCellRect.setLeft(u2px(m_style.leftMargin()));
 	m_layout.cornerCellRect.setWidth(m_layout.xAxisRect.left() - m_layout.cornerCellRect.left());
 
-	// set height of all channels to 0
-	// if some channel is maximized, hidden channel must not interact with mouse
+	// clear stale geometry so hidden channels cannot interact with the mouse
 	for (int i = 0; i < m_channels.count(); ++i) {
 		GraphChannel *ch = channelAt(i);
-		ch->m_layout.graphAreaRect.setHeight(0);
+		ch->m_layout.graphAreaRect = {};
+		ch->m_layout.graphDataGridRect = {};
+		ch->m_layout.verticalHeaderRect = {};
+		ch->m_layout.yAxisRect = {};
 	}
 	QVector<int> visible_channels = visibleChannels();
 	int sum_h_min = 0;
