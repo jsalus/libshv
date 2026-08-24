@@ -39,6 +39,7 @@ GraphWidget::GraphWidget(QWidget *parent)
 	setContextMenuPolicy(Qt::DefaultContextMenu);
 }
 
+
 void GraphWidget::setGraph(Graph *g)
 {
 	if(m_graph)
@@ -340,6 +341,9 @@ void GraphWidget::mousePressEvent(QMouseEvent *event)
 			else if(event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier)) {
 				m_mouseOperation = MouseOperation::GraphDataAreaLeftCtrlShiftPress;
 			}
+			else if(event->modifiers() == Qt::AltModifier) {
+				m_mouseOperation = MouseOperation::GraphDataAreaLeftAltPress;
+			}
 			else {
 				logMouseSelection() << "GraphAreaPress";
 #if QT_VERSION_MAJOR >= 6
@@ -396,7 +400,7 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *event)
 	auto old_mouse_op = m_mouseOperation;
 	m_mouseOperation = MouseOperation::None;
 	if(event->button() == Qt::LeftButton) {
-		if(old_mouse_op == MouseOperation::GraphDataAreaLeftPress) {
+		if(old_mouse_op == MouseOperation::GraphDataAreaLeftPress || old_mouse_op == MouseOperation::GraphDataAreaLeftAltPress) {
 			graph()->setSelectionRect(QRect());
 			update();
 			event->accept();
@@ -427,7 +431,7 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *event)
 				return;
 			}
 		}
-		else if(old_mouse_op == MouseOperation::GraphAreaSelection) {
+		else if(old_mouse_op == MouseOperation::GraphAreaAxisZoom || old_mouse_op == MouseOperation::GraphAreaRectSelection) {
 			m_graph->zoomToSelection(m_zoomType);
 			event->accept();
 			graph()->setSelectionRect(QRect());
@@ -452,7 +456,7 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *event)
 		}
 	}
 	else if(event->button() == Qt::RightButton) {
-		if(old_mouse_op == MouseOperation::GraphDataAreaRightPress || old_mouse_op == MouseOperation::GraphAreaSelection) {
+		if(old_mouse_op == MouseOperation::GraphDataAreaRightPress || old_mouse_op == MouseOperation::GraphAreaRectSelection) {
 			if(event->modifiers() == Qt::NoModifier) {
 				auto ch_ix = posToChannel(event->pos());
 				if(ch_ix) {
@@ -537,18 +541,26 @@ void GraphWidget::mouseMoveEvent(QMouseEvent *event)
 	case MouseOperation::GraphDataAreaLeftPress: {
 		QPoint point = pos - m_mouseOperationStartPos;
 		if (point.manhattanLength() > 3) {
-			m_mouseOperation = MouseOperation::GraphAreaSelection;
+			m_mouseOperation = MouseOperation::GraphAreaAxisZoom;
+		}
+		break;
+	}
+	case MouseOperation::GraphDataAreaLeftAltPress: {
+		QPoint point = pos - m_mouseOperationStartPos;
+		if (point.manhattanLength() > 3) {
+			m_mouseOperation = MouseOperation::GraphAreaRectSelection;
 		}
 		break;
 	}
 	case MouseOperation::GraphDataAreaRightPress: {
 		QPoint point = pos - m_mouseOperationStartPos;
 		if (point.manhattanLength() > 3) {
-			m_mouseOperation = MouseOperation::GraphAreaSelection;
+			m_mouseOperation = MouseOperation::GraphAreaRectSelection;
 		}
 		break;
 	}
-	case MouseOperation::GraphAreaSelection: {
+	case MouseOperation::GraphAreaAxisZoom:
+	case MouseOperation::GraphAreaRectSelection: {
 		auto ch1_ix = m_graph->posToChannel(m_mouseOperationStartPos);
 		if (!ch1_ix) {
 			break;
@@ -573,7 +585,9 @@ void GraphWidget::mouseMoveEvent(QMouseEvent *event)
 		}
 
 		QRect sr(m_mouseOperationStartPos, pos);
-		m_zoomType = zoomTypeFromRect(sr);
+		m_zoomType = m_mouseOperation == MouseOperation::GraphAreaRectSelection
+				? Graph::ZoomType::ZoomToRect
+				: zoomTypeFromRect(sr);
 		switch (m_zoomType) {
 		case Graph::ZoomType::Horizontal: sr = QRect(QPoint(sr.left(), ga.top()), QSize(sr.width(), ga.height())); break;
 		case Graph::ZoomType::Vertical: sr = QRect(QPoint(ga.left(), sr.top()), QSize(ga.width(), sr.height())); break;
@@ -734,20 +748,7 @@ Graph::ZoomType GraphWidget::zoomTypeFromRect(const QRect &rect)
 	if (w == 0) {
 		return Graph::ZoomType::Vertical;
 	}
-	static constexpr auto R = 0.3;
-	if (h > w) {
-		auto ratio = static_cast<double>(w) / h;
-		if (ratio < R) {
-			return Graph::ZoomType::Vertical;
-		}
-	}
-	if (w > h) {
-		auto ratio = static_cast<double>(h) / w;
-		if (ratio < R) {
-			return Graph::ZoomType::Horizontal;
-		}
-	}
-	return Graph::ZoomType::ZoomToRect;
+	return w >= h ? Graph::ZoomType::Horizontal : Graph::ZoomType::Vertical;
 }
 
 void GraphWidget::scrollToCurrentMousePosOnDrag()
