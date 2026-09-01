@@ -204,3 +204,33 @@ DOCTEST_TEST_CASE("Graph model")
 	}
 }
 
+DOCTEST_TEST_CASE("Graph model duplicate values")
+{
+	static constexpr auto CHANNEL = "channel";
+	shv::core::utils::ShvTypeDescr td(shv::core::utils::ShvTypeDescr::Type::Int);
+
+	DOCTEST_SUBCASE("duplicate values are ignored by default")
+	{
+		GraphModel graph_model;
+		graph_model.appendChannel(CHANNEL, {}, td);
+		graph_model.appendValueShvPath(CHANNEL, Sample(1, 1));
+		graph_model.appendValueShvPath(CHANNEL, Sample(2, 1));
+		graph_model.appendValueShvPath(CHANNEL, Sample(3, QVariant{}));
+		graph_model.appendValueShvPath(CHANNEL, Sample(4, QVariant{}));
+
+		REQUIRE(graph_model.count(0) == 2);
+	}
+
+	DOCTEST_SUBCASE("duplicate values can be enabled")
+	{
+		GraphModel graph_model;
+		graph_model.setDuplicateValuesEnabled(true);
+		graph_model.appendChannel(CHANNEL, {}, td);
+		graph_model.appendValueShvPath(CHANNEL, Sample(1, 1));
+		graph_model.appendValueShvPath(CHANNEL, Sample(2, 1));
+		graph_model.appendValueShvPath(CHANNEL, Sample(3, QVariant{}));
+		graph_model.appendValueShvPath(CHANNEL, Sample(4, QVariant{}));
+
+		REQUIRE(graph_model.count(0) == 4);
+	}
+}

@@ -2364,6 +2364,8 @@ void Graph::drawSamples(QPainter *painter, int channel_ix, const DataRect &src_r
 		if(sample_point_size % 2 == 0) {
 			sample_point_size++; // make sample point size odd to have it center-able
 		}
+		QFont not_available_font = m_style.font();
+		not_available_font.setPointSizeF(not_available_font.pointSizeF() * 0.7);
 
 		auto samples_cnt = samples.count();
 
@@ -2422,12 +2424,20 @@ void Graph::drawSamples(QPainter *painter, int channel_ix, const DataRect &src_r
 			else {
 				if(prev_point.isValid()) {
 					if(prev_point.isValueNotAvailable()) {
-						// draw hashed area from prev to current x
-						QRect rect = effective_dest_rect;
-						rect.setLeft(prev_point.x);
-						rect.setRight(current_point.x());
-						QBrush brush(line_pen.color().lighter(), Qt::BDiagPattern);
-						painter->fillRect(rect, brush);
+						if(interpolation == GraphChannel::Style::Interpolation::None) {
+							painter->setPen(steps_join_pen);
+							painter->drawLine(prev_point.x, effective_dest_rect.top(), prev_point.x, effective_dest_rect.bottom());
+							drawCenterTopText(painter, QPoint{prev_point.x, effective_dest_rect.top()}, QStringLiteral("N/A"),
+								not_available_font, line_pen.color().darker(400), line_pen.color());
+						}
+						else {
+							// draw hashed area from prev to current x
+							QRect rect = effective_dest_rect;
+							rect.setLeft(prev_point.x);
+							rect.setRight(current_point.x());
+							QBrush brush(line_pen.color().lighter(), Qt::BDiagPattern);
+							painter->fillRect(rect, brush);
+						}
 					}
 					else {
 						// paint prev sample ymin-ymax area
