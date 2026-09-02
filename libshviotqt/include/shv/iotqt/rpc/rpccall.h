@@ -78,6 +78,7 @@ public:
 	RpcCall* setParams(const ::shv::chainpack::RpcValue &params);
 	RpcCall* setTimeout(int timeout);
 	RpcCall* setUserId(const ::shv::chainpack::RpcValue &user_id);
+	RpcCall* setEyasUserId(const ::shv::chainpack::RpcValue &eyas_user_id);
 
 	std::string shvPath() const;
 	int start();
@@ -98,6 +99,7 @@ private:
 	shv::chainpack::RpcValue m_params;
 	int m_timeout = 0;
 	shv::chainpack::RpcValue m_userId;
+	shv::chainpack::RpcValue m_eyasUserId;
 	int m_requestId = 0;
 };
 

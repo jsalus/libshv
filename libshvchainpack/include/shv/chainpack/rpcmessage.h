@@ -48,6 +48,7 @@ public:
 								TunnelCtl = 15,
 								UserId = 16,
 								AccessLevel = 17,
+								EyasUserId = 18,
 								Source = 19,
 								Repeat = 20,
 								MAX};};
@@ -139,6 +140,11 @@ public:
 	void setUserId(const RpcValue &user_id);
 	static RpcValue userId(RpcValue::MetaData &meta);
 	static void setUserId(RpcValue::MetaData &meta, const RpcValue &user_id);
+
+	RpcValue eyasUserId() const;
+	void setEyasUserId(const RpcValue &user_id);
+	static RpcValue eyasUserId(RpcValue::MetaData &meta);
+	static void setEyasUserId(RpcValue::MetaData &meta, const RpcValue &user_id);
 
 	RpcValue::String source() const;
 	void setSource(const RpcValue::String& source);

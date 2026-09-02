@@ -84,12 +84,18 @@ int IRpcConnection::callShvMethod(const std::string &shv_path, const std::string
 	return callShvMethod(id, shv_path, method, params, user_id);
 }
 
+int IRpcConnection::callShvMethod(const std::string &shv_path, const std::string& method, const RpcValue &params, const RpcValue &user_id, const RpcValue &eyas_user_id)
+{
+	int id = nextRequestId();
+	return callShvMethod(id, shv_path, method, params, user_id, eyas_user_id);
+}
+
 int IRpcConnection::callShvMethod(int rq_id, const std::string &shv_path, const std::string& method, const RpcValue &params)
 {
 	return callShvMethod(rq_id, shv_path, method, params, {});
 }
 
-int IRpcConnection::callShvMethod(int rq_id, const std::string &shv_path, const std::string& method, const RpcValue &params, const RpcValue &user_id)
+int IRpcConnection::callShvMethod(int rq_id, const std::string &shv_path, const std::string& method, const RpcValue &params, const RpcValue &user_id, const RpcValue &eyas_user_id)
 {
 	RpcRequest rq;
 	rq.setRequestId(rq_id);
@@ -98,6 +104,8 @@ int IRpcConnection::callShvMethod(int rq_id, const std::string &shv_path, const 
 		rq.setParams(params);
 	if(user_id.isValid())
 		rq.setUserId(user_id);
+	if(eyas_user_id.isValid())
+		rq.setEyasUserId(eyas_user_id);
 	if(!shv_path.empty())
 		rq.setShvPath(shv_path);
 	sendRpcMessage(rq);

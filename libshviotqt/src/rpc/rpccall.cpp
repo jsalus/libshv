@@ -255,6 +255,13 @@ RpcCall *RpcCall::setUserId(const chainpack::RpcValue &user_id)
 	return this;
 }
 
+
+RpcCall *RpcCall::setEyasUserId(const chainpack::RpcValue &eyas_user_id)
+{
+	m_eyasUserId = eyas_user_id;
+	return this;
+}
+
 std::string RpcCall::shvPath() const
 {
 	return m_shvPath;
@@ -286,7 +293,7 @@ int RpcCall::start()
 		}
 		deleteLater();
 	});
-	m_rpcConnection->callShvMethod(rq_id, m_shvPath, m_method, m_params, m_userId);
+	m_rpcConnection->callShvMethod(rq_id, m_shvPath, m_method, m_params, m_userId, m_eyasUserId);
 	return rq_id;
 }
 

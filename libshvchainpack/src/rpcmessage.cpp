@@ -566,6 +566,27 @@ void RpcMessage::setUserId(RpcValue::MetaData &meta, const RpcValue &user_id)
 	meta.setValue(RpcMessage::MetaType::Tag::UserId, user_id);
 }
 
+
+RpcValue RpcMessage::eyasUserId() const
+{
+	return metaValue(RpcMessage::MetaType::Tag::EyasUserId);
+}
+
+void RpcMessage::setEyasUserId(const RpcValue &user_id)
+{
+	setMetaValue(RpcMessage::MetaType::Tag::EyasUserId, user_id);
+}
+
+RpcValue RpcMessage::eyasUserId(RpcValue::MetaData &meta)
+{
+	return meta.value(RpcMessage::MetaType::Tag::EyasUserId);
+}
+
+void RpcMessage::setEyasUserId(RpcValue::MetaData &meta, const RpcValue &user_id)
+{
+	meta.setValue(RpcMessage::MetaType::Tag::EyasUserId, user_id);
+}
+
 RpcValue::String RpcMessage::source() const
 {
 	return metaValue(RpcMessage::MetaType::Tag::Source).asString();
