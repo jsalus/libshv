@@ -239,7 +239,8 @@ void GraphModel::appendValue(qsizetype channel, Sample &&sample)
 						 << "diff:" << (sample.time - samples.last().time) << "msec.";
 			return;
 		}
-		if (!samples.isEmpty()
+		if (!isDuplicateValuesEnabled()
+			&& !samples.isEmpty()
 			&& channelInfo(channel).typeDescr.sampleType() == shv::core::utils::ShvTypeDescr::SampleType::Continuous
 			&& samples.last().value == sample.value) {
 			return;
